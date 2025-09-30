@@ -11,9 +11,9 @@ const rulesConfig = {
   groups: [
     {
       orgId: 1,
-      name: "ICDC Metrics - PICDCAPD01",
-      folder: "ICDC",
-      interval: "1m",
+      name: "en este lado pega el json que quieras xd ",
+      folder: "owa",
+      interval: "mucho",
       rules: [
         {
           uid: "example123",
@@ -38,7 +38,7 @@ const rulesConfig = {
         }
       ]
     }
-  ]
+  ] 
 };
 
 (async function () {
