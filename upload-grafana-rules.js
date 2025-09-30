@@ -1,44 +1,9 @@
-/**
- *Grafana Alerting Rules Upserter - API v1 provisioning
- * Soporta Recording Rules y Alert Rules con upsert automático (PUT/POST)
- */
-
 const DRY_RUN = false;
+
 const DISABLE_PROVENANCE = true;
 
-const rulesConfig = {
-  apiVersion: 1,
-  groups: [
-    {
-      orgId: 1,
-      name: "en este lado pega el json que quieras xd ",
-      folder: "owa",
-      interval: "mucho",
-      rules: [
-        {
-          uid: "example123",
-          title: "Example Rule",
-          condition: "A",
-          noDataState: "OK",
-          execErrState: "Alerting",
-          for: "0s",
-          isPaused: false,
-          annotations: { summary: "example" },
-          labels: { app_group: "ICDC" },
-          data: [
-            {
-              refId: "A",
-              queryType: "instant",
-              datasourceUid: "grafanacloud-logs",
-              model: {
-                expr: "up"
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ] 
+const rulesConfig = { 
+  //aqui va el json xd
 };
 
 (async function () {
