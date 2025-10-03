@@ -3,7 +3,9 @@ const DRY_RUN = false;
 const DISABLE_PROVENANCE = true;
 
 const rulesConfig = { 
+  
   //aqui va el json xd
+  
 };
 
 (async function () {
