@@ -1,0 +1,100 @@
+{
+    "apiVersion": 1,
+    "groups": [
+        {
+            "orgId": 1,
+            "name": "O11Y-Evaluation",
+            "folder": "O11Y",
+            "interval": "5m",
+            "rules": [
+                {
+                    "uid": "aeyd7dmk1vy80d",
+                    "title": "Exporter Down Monitor",
+                    "condition": "C",
+                    "data": [
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "grafanacloud-prom"
+                                },
+                                "editorMode": "code",
+                                "expr": "(\r\n  sum by (app_group, job, net_host_name) (\r\n    max_over_time(up{service_name=~\"prometheus.scrape.*\", net_host_name!~\"BCPRAC32|PBIOMORAP02|PBIOMORAP03\"}[5m])\r\n  ) > bool 0\r\n)\r\nor on (app_group, job, net_host_name)\r\n(\r\n  (\r\n    sum by (app_group, job, net_host_name) (\r\n      count_over_time(up{service_name=~\"prometheus.scrape.*\", net_host_name!~\"BCPRAC32|PBIOMORAP02|PBIOMORAP03\"}[30m])\r\n    ) > bool 0\r\n  ) * 0\r\n)\r\n",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "A"
+                            }
+                        },
+                        {
+                            "refId": "C",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                0
+                                            ],
+                                            "type": "eq"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": [
+                                                "C"
+                                            ]
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "last"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "A",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "C",
+                                "type": "threshold"
+                            }
+                        }
+                    ],
+                    "noDataState": "KeepLast",
+                    "execErrState": "KeepLast",
+                    "annotations": {
+                        "description": "The Exporter Monitor on \n{{ index $labels \"net_host_name\" }} has been down for over 5 minutes",
+                        "summary": "Exporter Monitor is Down"
+                    },
+                    "labels": {
+                        "appid": "{{ if $$labels.app_group }}{{ $$labels.app_group }}{{ else }}NODATA{{ end }}",
+                        "customurl": "https://bcp.grafana.net/d/otelcoldownalerts/otelcoldown-alerts?var-component_affected={{$$labels.net_host_name}}",
+                        "dashuid": "otelcoldown",
+                        "severity": "critical",
+                        "source_hostname": "{{ if $$labels.net_host_name }}{{ $$labels.net_host_name }}{{ else }}NODATA{{ end }}",
+                        "tipo_alerta": "inf",
+                        "type_hostname": "OTel Collector"
+                    },
+                    "isPaused": false
+                }
+            ]
+        }
+    ]
+}

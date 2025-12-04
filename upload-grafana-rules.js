@@ -3,7 +3,7 @@ const DRY_RUN = false;
 const DISABLE_PROVENANCE = true;
 
 const rulesConfig = {
-  
+    
 };
 
 (async function () {
