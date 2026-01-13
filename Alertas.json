@@ -3,14 +3,460 @@
     "groups": [
         {
             "orgId": 1,
-            "name": "O11Y-Evaluation",
-            "folder": "O11Y",
-            "interval": "5m",
+            "name": "PostgreSQL - 1m",
+            "folder": "PostgreSQL Alerts",
+            "interval": "1m",
             "rules": [
                 {
-                    "uid": "aeyd7dmk1vy80d",
-                    "title": "Exporter Down Monitor",
-                    "condition": "C",
+                    "uid": "bf31soi85qebkb",
+                    "title": "Service Down - PostgreSQL ",
+                    "condition": "A",
+                    "data": [
+                        {
+                            "refId": "pg_up",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "editorMode": "code",
+                                "expr": "sum by(app_group, host_name, bdr_role, cluster)(pg_up{app_group=~\"B24E|B24U|B24C\"})\r\nor\r\nsum by(app_group, host_name, bdr_role, cluster)(max_over_time(pg_up{app_group=~\"\"}[3d]))*0",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "pg_up"
+                            }
+                        },
+                        {
+                            "refId": "job_down",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "grafanacloud-prom"
+                                },
+                                "editorMode": "code",
+                                "expr": "sum by (app_group, host_name, bdr_role, cluster)(up{job=\"integrations/postgres\", app_group=~\"\"})\r\nor\r\n(sum by (app_group, host_name, bdr_role, cluster)(max_over_time(up{job=\"integrations/postgres\", app_group=~\"\"}[3d]))*0)-1",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "job_down"
+                            }
+                        },
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                0,
+                                                0
+                                            ],
+                                            "type": "gt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": []
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "avg"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "name": "Expression",
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "$pg_up < 1  && $job_down >= 0\n \n",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "A",
+                                "type": "math"
+                            }
+                        }
+                    ],
+                    "noDataState": "KeepLast",
+                    "execErrState": "KeepLast",
+                    "for": "3m",
+                    "annotations": {
+                        "description": "Host: {{ $labels.host_name }} - {{ $labels.bdr_role }} - {{ $labels.cluster }}  \n\nEstado: Posible caída o pérdida de conexión con PG.",
+                        "summary": "[Service Down - PostgreSQL]"
+                    },
+                    "labels": {
+                        "appid": "{{ if $labels.app_group }}{{ $labels.app_group }}{{ else }} NODATA{{ end }}",
+                        "customurl": "https://bcp.grafana.net/d/postgresqlalerts/postgresql-alerts?var-component_affected={{$labels.host_name}}",
+                        "dashuid": "postgresql",
+                        "severity": "info",
+                        "source_hostname": "{{ if $labels.host_name }}{{ $labels.host_name }}{{ else }} NODATA {{end}}",
+                        "tipo_alerta": "app",
+                        "type_hostname": "PostgreSQL"
+                    },
+                    "isPaused": false,
+                    "missing_series_evals_to_resolve": 2
+                },
+                {
+                    "uid": "ef31tcwo9q41sa",
+                    "title": " Backup Failed - Barman ",
+                    "condition": "B",
+                    "data": [
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "editorMode": "code",
+                                "expr": "sum by (server, app_group, host_name)(barman_backups_failed)",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "A"
+                            }
+                        },
+                        {
+                            "refId": "B",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                0
+                                            ],
+                                            "type": "gt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": []
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "avg"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "name": "Expression",
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "A",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "B",
+                                "type": "threshold"
+                            }
+                        }
+                    ],
+                    "noDataState": "KeepLast",
+                    "execErrState": "KeepLast",
+                    "annotations": {
+                        "description": "El servidor {{ $labels.host_name}} en {{ $labels.server}} ha registrado backups con error: {{ $values.A.Value }}.",
+                        "summary": "Backup Failed - Barman"
+                    },
+                    "labels": {
+                        "appid": "{{ if $labels.app_group }}{{ $labels.app_group }}{{ else }} NODATA{{ end }}",
+                        "customparams": "&var-server={{$labels.server}}",
+                        "customurl": "https://bcp.grafana.net/d/postgresqlalerts/postgresql-alerts?var-barman_host={{$labels.host_name}}&var-server={{$labels.server}}",
+                        "dashuid": "postgresql",
+                        "severity": "info",
+                        "source_hostname": "{{ if $labels.host_name }}{{ $labels.host_name }}{{ else }} NODATA {{end}}",
+                        "tipo_alerta": "app",
+                        "type_hostname": "Barman"
+                    },
+                    "isPaused": false,
+                    "missing_series_evals_to_resolve": 2
+                },
+                {
+                    "uid": "ef3big7lnrf28f",
+                    "title": "Long Transaction Detected - PostgreSQL ",
+                    "condition": "B",
+                    "data": [
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "editorMode": "code",
+                                "expr": "max by (host_name,app_group, application_name)(pg_stat_activity_max_tx_duration{app_group=~\"\"})",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "A"
+                            }
+                        },
+                        {
+                            "refId": "B",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                1800
+                                            ],
+                                            "type": "gt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": []
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "avg"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "name": "Expression",
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "A",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "B",
+                                "type": "threshold"
+                            }
+                        }
+                    ],
+                    "noDataState": "KeepLast",
+                    "execErrState": "KeepLast",
+                    "for": "3m",
+                    "annotations": {
+                        "description": "Se ha detectado una transacción con duración superior a 30 minutos en el servidor: {{ $labels.host_name}} para la Aplicación: {{ $labels.application_name }}",
+                        "summary": "Long Transaction Detected - PostgreSQL"
+                    },
+                    "labels": {
+                        "appid": "{{ if $labels.app_group }}{{ $labels.app_group }}{{ else }}NODATA{{ end }}",
+                        "customparams": "&var-application_name={{$labels.application_name}}",
+                        "customurl": "https://bcp.grafana.net/d/postgresqlalerts/postgresql-alerts?var-component_affected={{$labels.host_name}}&var-application_name={{$labels.application_name}}",
+                        "dashuid": "postgresql",
+                        "severity": "info",
+                        "source_hostname": "{{ if $labels.host_name }}{{ $labels.host_name }}{{ else }} NODATA {{end}}",
+                        "tipo_alerta": "app",
+                        "type_hostname": "PostgreSQL"
+                    },
+                    "isPaused": false,
+                    "missing_series_evals_to_resolve": 2
+                },
+                {
+                    "uid": "af3c29vyb4740f",
+                    "title": "Replication Delay - PostgreSQL",
+                    "condition": "B",
+                    "data": [
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "editorMode": "code",
+                                "expr": "max by (host_name,app_group,target_name, slot_name)(bdr_node_slots_replay_lag_seconds{app_group=~\"\",slot_name!~\"bdr_db24eps_bdrgroup|bdr_dbapsf_bdrgroup|bdr_dbmcas_bdrgroup\"})",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "A"
+                            }
+                        },
+                        {
+                            "refId": "B",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                60
+                                            ],
+                                            "type": "gt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": []
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "avg"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "name": "Expression",
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "A",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "B",
+                                "type": "threshold"
+                            }
+                        }
+                    ],
+                    "noDataState": "KeepLast",
+                    "execErrState": "KeepLast",
+                    "for": "1m",
+                    "annotations": {
+                        "description": "[ {{ $labels.host_name}} ] - Se presenta retraso actual de {{ printf \"%.0f\" $values.A.Value }} s,  en la replicación: \n\nTarget Name: {{ $labels.target_name}}  \nSlot Name: {{ $labels.slot_name}}  \n\n.",
+                        "summary": "Replication Delay - PostgreSQL"
+                    },
+                    "labels": {
+                        "appid": "{{ if $labels.app_group }}{{ $labels.app_group }}{{ else }}NODATA{{ end }}",
+                        "customparams": "&var-slot_name={{$labels.slot_name}}&var-target_name={{$labels.target_name}}",
+                        "customurl": "https://bcp.grafana.net/d/postgresqlalerts/postgresql-alerts?var-component_affected={{$labels.host_name}}&var-slot_name={{$labels.slot_name}}&var-target_name={{$labels.target_name}}",
+                        "dashuid": "postgresql",
+                        "severity": "info",
+                        "source_hostname": "{{ if $labels.host_name }}{{ $labels.host_name }}{{ else }} NODATA {{end}}",
+                        "tipo_alerta": "app",
+                        "type_hostname": "PostgreSQL - BDR"
+                    },
+                    "isPaused": false,
+                    "missing_series_evals_to_resolve": 2
+                },
+                {
+                    "uid": "ff3c449ejg074d",
+                    "title": "Replication Down - PostgreSQL",
+                    "condition": "B",
+                    "data": [
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "editorMode": "code",
+                                "expr": "min by (app_group,host_name,origin_name, cluster)(bdr_subscription_summary_active{app_group=~\"\"})\r\nor\r\nmin by (app_group,host_name,origin_name, cluster)(max_over_time(bdr_subscription_summary_active{app_group=~\"\"}[10m]))*0",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "A"
+                            }
+                        },
+                        {
+                            "refId": "B",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                1
+                                            ],
+                                            "type": "lt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": []
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "avg"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "name": "Expression",
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "A",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "B",
+                                "type": "threshold"
+                            }
+                        }
+                    ],
+                    "noDataState": "KeepLast",
+                    "execErrState": "KeepLast",
+                    "for": "3m",
+                    "annotations": {
+                        "description": "Se ha detectado que el Nodo {{ $labels.host_name}} no está replicando con {{ $labels.origin_name}}",
+                        "summary": "Replication Down - PostgreSQL"
+                    },
+                    "labels": {
+                        "appid": "{{ if $labels.app_group }}{{ $labels.app_group }}{{ else }}NODATA{{ end }}",
+                        "customparams": "&var-origin_name={{$labels.origin_name}}",
+                        "customurl": "https://bcp.grafana.net/d/postgresqlalerts/postgresql-alerts?var-component_affected={{$labels.host_name}}&var-origin_name={{$labels.origin_name}}",
+                        "dashuid": "postgresql",
+                        "severity": "info",
+                        "source_hostname": "{{ if $labels.host_name }}{{ $labels.host_name }}{{ else }} NODATA {{end}}",
+                        "tipo_alerta": "app",
+                        "type_hostname": "PostgreSQL - BDR"
+                    },
+                    "isPaused": false,
+                    "missing_series_evals_to_resolve": 2
+                },
+                {
+                    "uid": "ef8oy376bwzr4f",
+                    "title": "PostgreSQL Blocking Root Detected – WARNING",
+                    "condition": "D",
                     "data": [
                         {
                             "refId": "A",
@@ -25,7 +471,7 @@
                                     "uid": "grafanacloud-prom"
                                 },
                                 "editorMode": "code",
-                                "expr": "(\r\n  sum by (app_group, job, net_host_name) (\r\n    max_over_time(up{service_name=~\"prometheus.scrape.*\", net_host_name!~\"BCPRAC32|PBIOMORAP02|PBIOMORAP03\"}[5m])\r\n  ) > bool 0\r\n)\r\nor on (app_group, job, net_host_name)\r\n(\r\n  (\r\n    sum by (app_group, job, net_host_name) (\r\n      count_over_time(up{service_name=~\"prometheus.scrape.*\", net_host_name!~\"BCPRAC32|PBIOMORAP02|PBIOMORAP03\"}[30m])\r\n    ) > bool 0\r\n  ) * 0\r\n)\r\n",
+                                "expr": "max by (app_group, host_name, blocking_pid, state,usename)(pg_lock_blocking_summary_blocked_processes{app_group=~\"\"})",
                                 "instant": true,
                                 "intervalMs": 1000,
                                 "legendFormat": "__auto",
@@ -35,7 +481,51 @@
                             }
                         },
                         {
+                            "refId": "B",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "grafanacloud-prom"
+                                },
+                                "editorMode": "code",
+                                "expr": "max by (app_group, host_name, blocking_pid, state,usename)(pg_lock_blocking_summary_blocking_duration_seconds{app_group=~\"\"})",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "B"
+                            }
+                        },
+                        {
                             "refId": "C",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "grafanacloud-prom"
+                                },
+                                "editorMode": "code",
+                                "expr": "max by (app_group, host_name, blocking_pid, state,usename)(pg_lock_blocking_summary_severity{app_group=~\"B24E|B24U|B24C\"})",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "C"
+                            }
+                        },
+                        {
+                            "refId": "D",
                             "relativeTimeRange": {
                                 "from": 0,
                                 "to": 0
@@ -46,51 +536,183 @@
                                     {
                                         "evaluator": {
                                             "params": [
+                                                0,
                                                 0
                                             ],
-                                            "type": "eq"
+                                            "type": "gt"
                                         },
                                         "operator": {
                                             "type": "and"
                                         },
                                         "query": {
-                                            "params": [
-                                                "C"
-                                            ]
+                                            "params": []
                                         },
                                         "reducer": {
                                             "params": [],
-                                            "type": "last"
+                                            "type": "avg"
                                         },
                                         "type": "query"
                                     }
                                 ],
                                 "datasource": {
+                                    "name": "Expression",
                                     "type": "__expr__",
                                     "uid": "__expr__"
                                 },
-                                "expression": "A",
+                                "expression": "$A >= 2 && $B >= 120 && $C == 2",
+                                "hide": false,
                                 "intervalMs": 1000,
                                 "maxDataPoints": 43200,
-                                "refId": "C",
-                                "type": "threshold"
+                                "refId": "D",
+                                "type": "math"
                             }
                         }
                     ],
                     "noDataState": "KeepLast",
                     "execErrState": "KeepLast",
                     "annotations": {
-                        "description": "The Exporter Monitor on \n{{ index $labels \"net_host_name\" }} has been down for over 5 minutes",
-                        "summary": "Exporter Monitor is Down"
+                        "description": "Blocking root  detectado - WARNING\n\nHost: {{ $labels.host_name }}\nPID: {{ $labels.blocking_pid }}\nUser: {{ $labels.usename }}\nState: {{ $labels.state }}\n\nSe detectaron {{ printf \"%.0f\" $values.A.Value }} procesos bloqueados por el PID {{ $labels.blocking_pid }}, con una duración aproximada de {{ printf \"%.0f\" $values.B.Value }} segundos.\n\n🟠 ACCIÓN: INVESTIGAR / POSIBLE KILL",
+                        "summary": "PostgreSQL Blocking Root Detected – WARNING"
                     },
                     "labels": {
-                        "appid": "{{ if $$labels.app_group }}{{ $$labels.app_group }}{{ else }}NODATA{{ end }}",
-                        "customurl": "https://bcp.grafana.net/d/otelcoldownalerts/otelcoldown-alerts?var-component_affected={{$$labels.net_host_name}}",
-                        "dashuid": "otelcoldown",
-                        "severity": "critical",
-                        "source_hostname": "{{ if $$labels.net_host_name }}{{ $$labels.net_host_name }}{{ else }}NODATA{{ end }}",
-                        "tipo_alerta": "inf",
-                        "type_hostname": "OTel Collector"
+                        "appid": "{{ if $labels.app_group }}{{ $labels.app_group }}{{ else }}NODATA{{ end }}",
+                        "customurl": "https://bcp.grafana.net/d/postgresqlalerts/postgresql-alerts?var-component_affected={{$labels.host_name}}",
+                        "dashuid": "postgresql",
+                        "severity": "info",
+                        "source_hostname": "{{ if $labels.host_name }}{{ $labels.host_name }}{{ else }} NODATA {{end}}",
+                        "tipo_alerta": "app",
+                        "type_hostname": "PostgreSQL"
+                    },
+                    "isPaused": false
+                },
+                {
+                    "uid": "cf9yk6vkibu9sf",
+                    "title": "PostgreSQL Blocking Root Detected – CRITICAL",
+                    "condition": "D",
+                    "data": [
+                        {
+                            "refId": "A",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "grafanacloud-prom"
+                                },
+                                "editorMode": "code",
+                                "expr": "max by (app_group, host_name, blocking_pid, state,usename)(pg_lock_blocking_summary_blocked_processes{app_group=~\"B24E|B24U|B24C\"})",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "A"
+                            }
+                        },
+                        {
+                            "refId": "B",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "grafanacloud-prom"
+                                },
+                                "editorMode": "code",
+                                "expr": "max by (app_group, host_name, blocking_pid, state,usename)(pg_lock_blocking_summary_blocking_duration_seconds{app_group=~\"B24E|B24U|B24C\"})",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "B"
+                            }
+                        },
+                        {
+                            "refId": "C",
+                            "relativeTimeRange": {
+                                "from": 600,
+                                "to": 0
+                            },
+                            "datasourceUid": "grafanacloud-prom",
+                            "model": {
+                                "datasource": {
+                                    "type": "prometheus",
+                                    "uid": "grafanacloud-prom"
+                                },
+                                "editorMode": "code",
+                                "expr": "max by (app_group, host_name, blocking_pid, state,usename)(pg_lock_blocking_summary_severity{app_group=~\"B24E|B24U|B24C\"})",
+                                "instant": true,
+                                "intervalMs": 1000,
+                                "legendFormat": "__auto",
+                                "maxDataPoints": 43200,
+                                "range": false,
+                                "refId": "C"
+                            }
+                        },
+                        {
+                            "refId": "D",
+                            "relativeTimeRange": {
+                                "from": 0,
+                                "to": 0
+                            },
+                            "datasourceUid": "__expr__",
+                            "model": {
+                                "conditions": [
+                                    {
+                                        "evaluator": {
+                                            "params": [
+                                                0,
+                                                0
+                                            ],
+                                            "type": "gt"
+                                        },
+                                        "operator": {
+                                            "type": "and"
+                                        },
+                                        "query": {
+                                            "params": []
+                                        },
+                                        "reducer": {
+                                            "params": [],
+                                            "type": "avg"
+                                        },
+                                        "type": "query"
+                                    }
+                                ],
+                                "datasource": {
+                                    "name": "Expression",
+                                    "type": "__expr__",
+                                    "uid": "__expr__"
+                                },
+                                "expression": "$A >= 3 && $B >= 180 && $C == 3",
+                                "intervalMs": 1000,
+                                "maxDataPoints": 43200,
+                                "refId": "D",
+                                "type": "math"
+                            }
+                        }
+                    ],
+                    "noDataState": "KeepLast",
+                    "execErrState": "KeepLast",
+                    "annotations": {
+                        "description": "Blocking root  detectado - CRITICAL\n\nHost: {{ $labels.host_name }}\nPID: {{ $labels.blocking_pid }}\nUser: {{ $labels.usename }}\nState: {{ $labels.state }}\n\nSe detectaron {{ printf \"%.0f\" $values.A.Value }} procesos bloqueados por el PID {{ $labels.blocking_pid }}, con una duración aproximada de {{ printf \"%.0f\" $values.B.Value }} segundos.\n\n🔴 ACCIÓN: KILL INMEDIATAMENTE (Idle en transacción)",
+                        "summary": "PostgreSQL Blocking Root Detected – CRITICAL"
+                    },
+                    "labels": {
+                        "appid": "{{ if $labels.app_group }}{{ $labels.app_group }}{{ else }}NODATA{{ end }}",
+                        "customurl": "https://bcp.grafana.net/d/postgresqlalerts/postgresql-alerts?var-component_affected={{$labels.host_name}}",
+                        "dashuid": "postgresql",
+                        "severity": "info",
+                        "source_hostname": "{{ if $labels.host_name }}{{ $labels.host_name }}{{ else }} NODATA {{end}}",
+                        "tipo_alerta": "app",
+                        "type_hostname": "PostgreSQL"
                     },
                     "isPaused": false
                 }
